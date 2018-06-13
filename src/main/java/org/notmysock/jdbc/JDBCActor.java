@@ -53,7 +53,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
       long t1 = -1;
       try {
         try {
-          stmt = conn.prepareStatement(queries.findAny().get());
+          stmt = conn.prepareStatement(queries.findFirst().get());
           stmt.execute();
           t1 = System.nanoTime();
           result.success(t0, t1);
