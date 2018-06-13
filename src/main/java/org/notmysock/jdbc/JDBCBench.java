@@ -7,11 +7,14 @@ import org.apache.commons.cli.ParseException;
 import org.notmysock.jdbc.BenchUtils.BenchOptions;
 
 public class JDBCBench {
-  public static void main(String[] args) throws ParseException {
+  public static void main(String[] args) throws ParseException, InterruptedException {
     BenchOptions opts = BenchUtils.getOptions(args);
     ExecutorService threads = Executors.newFixedThreadPool(opts.threads);
     for (int i = 0; i < opts.threads; i++) {
       threads.submit(new JDBCActor(opts.url, opts.loops));
+      if (opts.rampup > 0) {
+        Thread.sleep(opts.rampup);
+      }
     }
     threads.shutdown();
   }

@@ -13,11 +13,15 @@ public class BenchUtils {
     public final String url;
     public final int threads;
     public final int loops;
+    public final int rampup;
+    public final int gaptime;
 
     public BenchOptions(CommandLine cmd) {
       this.url = cmd.getOptionValue("u");
       this.threads = Integer.parseInt(cmd.getOptionValue("t", "1"));
       this.loops = Integer.parseInt(cmd.getOptionValue("n", "10"));
+      this.rampup = Integer.parseInt(cmd.getOptionValue("r", "0"));
+      this.gaptime = Integer.parseInt(cmd.getOptionValue("g", "0"));
     }
 
     public static Options get() {
@@ -25,6 +29,8 @@ public class BenchUtils {
       options.addOption("u", true, "jdbc URL");
       options.addOption("t", true, "thread count");
       options.addOption("n", true, "iterations");
+      options.addOption("r", true, "rampup in ms");
+      options.addOption("g", true, "gap between loops in ms");
       return options;
     }
   }

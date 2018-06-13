@@ -44,7 +44,7 @@ public class JDBCActor implements Runnable {
       long t1 = -1;
       try {
         try {
-          stmt = conn.prepareStatement("select count(1) from mostly_nulls");
+          stmt = conn.prepareStatement("select current_timestamp");
           stmt.execute();
           t1 = System.nanoTime();
         } finally {
