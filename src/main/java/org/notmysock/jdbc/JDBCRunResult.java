@@ -1,6 +1,7 @@
 package org.notmysock.jdbc;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
 public class JDBCRunResult {
@@ -29,11 +30,11 @@ public class JDBCRunResult {
   }
   
   public LongStream getSamples() {
-    return Arrays.stream(samples, 0, current).filter( i ->  i > 0);
+    return Arrays.stream(samples, 0, current).filter( i ->  i > 0).map(t -> TimeUnit.NANOSECONDS.toMillis(t));
   }
   
   public LongStream getErrors() {
-    return Arrays.stream(samples, 0, current).filter( i ->  i < 0);
+    return Arrays.stream(samples, 0, current).filter( i ->  i < 0).map(t -> TimeUnit.NANOSECONDS.toMillis(t));
   }
   
   public int getId() {

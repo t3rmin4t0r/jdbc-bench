@@ -38,6 +38,6 @@ public class JDBCBench {
       errors = errors + r.getErrors().count();
     }
     
-    System.out.printf("With %d users (x %d loops) : errors = %d, avg=%d ns, best=%d ns, worst=%d ns\n", opts.threads, opts.loops, errors, (sum/count),  min, max);
+    System.out.printf("With %d users (x %d loops) : errors = %d, avg=%d ms, best=%d ms, worst=%d ms\n", opts.threads, opts.loops, errors, (sum/count),  min, max);
   }
 }
