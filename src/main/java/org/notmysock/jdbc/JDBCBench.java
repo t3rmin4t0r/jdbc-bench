@@ -19,7 +19,7 @@ public class JDBCBench {
     ExecutorService threads = Executors.newFixedThreadPool(opts.threads);
     ArrayList<Future<JDBCRunResult>> results = new ArrayList<Future<JDBCRunResult>>(opts.threads);
     for (int i = 0; i < opts.threads; i++) {
-      results.add(threads.submit(new JDBCActor(i, opts.url, opts.loops, opts.gaptime)));
+      results.add(threads.submit(new JDBCActor(i, opts.url, opts.loops, opts.gaptime, opts.queries)));
       if (opts.rampup > 0) {
         Thread.sleep(opts.rampup);
       }
@@ -38,6 +38,6 @@ public class JDBCBench {
       errors = errors + r.getErrors().count();
     }
     
-    System.out.printf("With %d users (x %d loops) : errors = %d, avg=%.2f ns, best=%d ns, worst=%d ns\n", opts.threads, opts.loops, errors, (sum/count),  min, max);
+    System.out.printf("With %d users (x %d loops) : errors = %d, avg=%d ns, best=%d ns, worst=%d ns\n", opts.threads, opts.loops, errors, (sum/count),  min, max);
   }
 }
