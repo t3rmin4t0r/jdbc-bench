@@ -12,13 +12,23 @@ import org.apache.commons.cli.ParseException;
 
 public class BenchUtils {
 
+  public static class BenchQuery {
+    public final String name;
+    public final String contents;
+    
+    public BenchQuery(String name, String contents) {
+      this.name = name;
+      this.contents = contents;
+    }
+  }
+
   public static class BenchOptions {
     public final String url;
     public final int threads;
     public final int loops;
     public final int rampup;
     public final int gaptime;
-    public final Iterator<String> queries;
+    public final Iterator<BenchQuery> queries;
 
     public BenchOptions(CommandLine cmd) {
       this.url = cmd.getOptionValue("u");
@@ -26,7 +36,7 @@ public class BenchUtils {
       this.loops = Integer.parseInt(cmd.getOptionValue("n", "10"));
       this.rampup = Integer.parseInt(cmd.getOptionValue("r", "0"));
       this.gaptime = Integer.parseInt(cmd.getOptionValue("g", "0"));
-      String query = cmd.getOptionValue("q", "select current_timestamp");
+      BenchQuery query = new BenchQuery("arg", cmd.getOptionValue("q", "select current_timestamp"));
       this.queries = Stream.generate(() -> query).iterator();
     }
 

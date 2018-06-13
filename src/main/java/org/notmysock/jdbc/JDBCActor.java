@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.notmysock.jdbc.BenchUtils.BenchOptions;
+import org.notmysock.jdbc.BenchUtils.BenchQuery;
 
 public class JDBCActor implements Callable<JDBCRunResult> {
 
@@ -17,9 +18,9 @@ public class JDBCActor implements Callable<JDBCRunResult> {
   private final int loops;
   private final int gap;
   private final int num;
-  private final Iterator<String> queries;
+  private final Iterator<BenchQuery> queries;
 
-  public JDBCActor(int num, String url, int loops, int gaptime, Iterator<String> queries) {
+  public JDBCActor(int num, String url, int loops, int gaptime, Iterator<BenchQuery> queries) {
     this.url = url;
     this.loops = loops;
     this.gap = gaptime;
@@ -54,7 +55,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
       long t1 = -1;
       try {
         try {
-          stmt = conn.prepareStatement(queries.next());
+          stmt = conn.prepareStatement(queries.next().contents);
           stmt.execute();
           t1 = System.nanoTime();
           result.success(t0, t1);
