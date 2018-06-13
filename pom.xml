@@ -67,7 +67,7 @@
 							<manifest>
 								<addClasspath>true</addClasspath>
 								<classpathPrefix>lib/</classpathPrefix>
-								<mainClass>org.notmysock.jdbc.JDBCActor</mainClass>
+								<mainClass>org.notmysock.jdbc.JDBCBench</mainClass>
 							</manifest>
 						</archive>
 					</configuration>
