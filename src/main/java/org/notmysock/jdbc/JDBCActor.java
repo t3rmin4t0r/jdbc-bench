@@ -13,18 +13,20 @@ public class JDBCActor implements Runnable {
   private final String url;
   private final int loops;
   private final int gap;
+  private final int num;
 
-  public JDBCActor(String url, int loops, int gaptime) {
+  public JDBCActor(int num, String url, int loops, int gaptime) {
     this.url = url;
     this.loops = loops;
     this.gap = gaptime;
+    this.num = num;
   }
 
   public static void main(String[] args) throws Exception {
 
     BenchOptions c = BenchUtils.getOptions(args);
 
-    JDBCActor a = new JDBCActor(c.url, c.loops, c.gaptime);
+    JDBCActor a = new JDBCActor(1, c.url, c.loops, c.gaptime);
 
     a.run();
   }
@@ -58,10 +60,14 @@ public class JDBCActor implements Runnable {
         e.printStackTrace();
       }
       long ms = TimeUnit.MILLISECONDS.convert(t1 - t0, TimeUnit.NANOSECONDS);
-      System.out.printf("[%s] Run %d - %d ms\n", this, i, ms);
+      long wait = 0;
       if (ms < gap) {
+        wait = gap - ms;
+      }
+      System.out.printf("[Actor #%03d] Run %d - %d ms (+%d ms)\n", num, i, ms, wait);
+      if (wait > 0) {
         try {
-          Thread.sleep(gap-ms);
+          Thread.sleep(wait);
         } catch (InterruptedException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
