@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -60,7 +61,7 @@ public class JDBCActor implements Runnable {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      System.out.printf("Run %d - %d ns\n", i, (t1-t0));
+      System.out.printf("Run %d - %d ns\n", i, TimeUnit.MILLISECONDS.convert(t1-t0, TimeUnit.NANOSECONDS));
     }
     
     if (conn != null) {
