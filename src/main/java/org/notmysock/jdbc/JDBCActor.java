@@ -61,7 +61,7 @@ public class JDBCActor implements Runnable {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      System.out.printf("Run %d - %d ns\n", i, TimeUnit.MILLISECONDS.convert(t1-t0, TimeUnit.NANOSECONDS));
+      System.out.printf("Run %d - %d ms\n", i, TimeUnit.MILLISECONDS.convert(t1-t0, TimeUnit.NANOSECONDS));
     }
     
     if (conn != null) {
