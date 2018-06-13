@@ -45,10 +45,13 @@ public class JDBCActor implements Runnable {
     
     PreparedStatement stmt = null;
     for (int i = 0; i < 10; i++) {
+      long t0 = System.nanoTime();
+      long t1 = -1;
       try {
         try {
           stmt = conn.prepareStatement("select count(1) from mostly_nulls");
           stmt.execute();
+          t1 = System.nanoTime();
         } finally {
           if (stmt != null)
             stmt.close();
@@ -57,6 +60,7 @@ public class JDBCActor implements Runnable {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
+      System.out.printf("Run %d - %d ns\n", i, (t1-t0));
     }
     
     if (conn != null) {
