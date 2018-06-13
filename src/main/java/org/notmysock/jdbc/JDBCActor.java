@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -16,9 +17,9 @@ public class JDBCActor implements Callable<JDBCRunResult> {
   private final int loops;
   private final int gap;
   private final int num;
-  private final Stream<String> queries;
+  private final Iterator<String> queries;
 
-  public JDBCActor(int num, String url, int loops, int gaptime, Stream<String> queries) {
+  public JDBCActor(int num, String url, int loops, int gaptime, Iterator<String> queries) {
     this.url = url;
     this.loops = loops;
     this.gap = gaptime;
@@ -53,7 +54,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
       long t1 = -1;
       try {
         try {
-          stmt = conn.prepareStatement(queries.findFirst().get());
+          stmt = conn.prepareStatement(queries.next());
           stmt.execute();
           t1 = System.nanoTime();
           result.success(t0, t1);

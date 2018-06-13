@@ -1,5 +1,6 @@
 package org.notmysock.jdbc;
 
+import java.util.Iterator;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
@@ -17,7 +18,7 @@ public class BenchUtils {
     public final int loops;
     public final int rampup;
     public final int gaptime;
-    public final Stream<String> queries;
+    public final Iterator<String> queries;
 
     public BenchOptions(CommandLine cmd) {
       this.url = cmd.getOptionValue("u");
@@ -26,7 +27,7 @@ public class BenchUtils {
       this.rampup = Integer.parseInt(cmd.getOptionValue("r", "0"));
       this.gaptime = Integer.parseInt(cmd.getOptionValue("g", "0"));
       String query = cmd.getOptionValue("q", "select current_timestamp");
-      this.queries = Stream.generate(() -> query);
+      this.queries = Stream.generate(() -> query).iterator();
     }
 
     public static Options get() {
