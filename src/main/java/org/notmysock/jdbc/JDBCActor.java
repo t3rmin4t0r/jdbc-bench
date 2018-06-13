@@ -4,11 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.notmysock.jdbc.BenchUtils.BenchOptions;
 
-public class JDBCActor implements Runnable {
+public class JDBCActor implements Callable<JDBCRunResult> {
 
   private final String url;
   private final int loops;
@@ -28,18 +29,19 @@ public class JDBCActor implements Runnable {
 
     JDBCActor a = new JDBCActor(1, c.url, c.loops, c.gaptime);
 
-    a.run();
+    a.call();
   }
 
   @Override
-  public void run() {
+  public JDBCRunResult call() throws Exception {
+    JDBCRunResult result = new JDBCRunResult(num, loops);
     Connection conn = null;
     try {
       conn = DriverManager.getConnection(this.url);
     } catch (SQLException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-      return;
+      return result;
     }
 
     PreparedStatement stmt = null;
@@ -51,6 +53,7 @@ public class JDBCActor implements Runnable {
           stmt = conn.prepareStatement("select count(1) from onerow where x=42");
           stmt.execute();
           t1 = System.nanoTime();
+          result.success(t0, t1);
         } finally {
           if (stmt != null)
             stmt.close();
@@ -58,6 +61,8 @@ public class JDBCActor implements Runnable {
       } catch (SQLException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
+        t1 = System.nanoTime();
+        result.fail(t0, t1);
       }
       long ms = TimeUnit.MILLISECONDS.convert(t1 - t0, TimeUnit.NANOSECONDS);
       long wait = 0;
@@ -83,5 +88,7 @@ public class JDBCActor implements Runnable {
         e.printStackTrace();
       }
     }
+    
+    return result;
   }
 }
