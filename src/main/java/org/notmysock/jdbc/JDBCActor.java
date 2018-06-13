@@ -6,36 +6,30 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
+import org.notmysock.jdbc.BenchUtils.BenchOptions;
 
 public class JDBCActor implements Runnable {
 
-  public final String url;
+  private final String url;
+  private final int loops;
 
-  public JDBCActor(String url) {
+  public JDBCActor(String url, int loops) {
     this.url = url;
+    this.loops = loops;
   }
 
   public static void main(String[] args) throws Exception {
-    Options options = new Options();
-    options.addOption("u", true, "jdbc URL");
 
-    CommandLineParser parser = new DefaultParser();
-    CommandLine cmd = parser.parse(options, args);
-    
-    String url = cmd.getOptionValue("u");
-    
-    JDBCActor a = new JDBCActor(url);
-    
+    BenchOptions c = BenchUtils.getOptions(args);
+
+    JDBCActor a = new JDBCActor(c.url, c.loops);
+
     a.run();
   }
 
   @Override
   public void run() {
-    Connection conn = null; 
+    Connection conn = null;
     try {
       conn = DriverManager.getConnection(this.url);
     } catch (SQLException e) {
@@ -43,9 +37,9 @@ public class JDBCActor implements Runnable {
       e.printStackTrace();
       return;
     }
-    
+
     PreparedStatement stmt = null;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < loops; i++) {
       long t0 = System.nanoTime();
       long t1 = -1;
       try {
@@ -61,9 +55,10 @@ public class JDBCActor implements Runnable {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      System.out.printf("Run %d - %d ms\n", i, TimeUnit.MILLISECONDS.convert(t1-t0, TimeUnit.NANOSECONDS));
+      System.out.printf("[%s] Run %d - %d ms\n", this, i,
+          TimeUnit.MILLISECONDS.convert(t1 - t0, TimeUnit.NANOSECONDS));
     }
-    
+
     if (conn != null) {
       try {
         conn.close();
