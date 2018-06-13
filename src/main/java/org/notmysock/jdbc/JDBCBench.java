@@ -11,7 +11,7 @@ public class JDBCBench {
     BenchOptions opts = BenchUtils.getOptions(args);
     ExecutorService threads = Executors.newFixedThreadPool(opts.threads);
     for (int i = 0; i < opts.threads; i++) {
-      threads.submit(new JDBCActor(opts.url, opts.loops));
+      threads.submit(new JDBCActor(i, opts.url, opts.loops, opts.gaptime));
       if (opts.rampup > 0) {
         Thread.sleep(opts.rampup);
       }
