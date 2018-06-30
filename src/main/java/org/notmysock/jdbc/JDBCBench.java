@@ -36,6 +36,8 @@ public class JDBCBench {
       sum = sum + r.getSamples().sum();
       count = count + r.getSamples().count();
       errors = errors + r.getErrors().count();
+
+      r.close();
     }
     
     System.out.printf("With %d users (x %d loops) : errors = %d, avg=%d ms, best=%d ms, worst=%d ms\n", opts.threads, opts.loops, errors, (sum/count),  min, max);

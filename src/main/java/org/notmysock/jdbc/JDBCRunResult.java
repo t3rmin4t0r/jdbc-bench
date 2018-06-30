@@ -1,14 +1,17 @@
 package org.notmysock.jdbc;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
-public class JDBCRunResult {
+public class JDBCRunResult implements AutoCloseable {
 
   private int id;
   private long[] samples;
   private int current = 0;
+  private Connection connection;
 
   public JDBCRunResult(int id, int samples) {
     this.id = id;
@@ -39,5 +42,27 @@ public class JDBCRunResult {
   
   public int getId() {
     return id;
+  }
+
+  public void setConnection(Connection conn) {
+    this.connection = conn;
+  }
+  
+  public Connection getConnection() {
+    return this.connection;
+  }
+  
+  @Override
+  public void close() {
+    if (connection != null) {
+      try {
+        connection.close();
+      } catch (SQLException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } finally {
+        this.connection = null;
+      }
+    }
   }
 }
