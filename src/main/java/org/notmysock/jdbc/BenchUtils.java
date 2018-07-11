@@ -1,5 +1,6 @@
 package org.notmysock.jdbc;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
@@ -23,7 +24,7 @@ public class BenchUtils {
   }
 
   public static class BenchOptions {
-    public final String url;
+    public final Iterator<String> urls;
     public final int threads;
     public final int loops;
     public final int rampup;
@@ -31,13 +32,18 @@ public class BenchUtils {
     public final Iterator<BenchQuery> queries;
 
     public BenchOptions(CommandLine cmd) {
-      this.url = cmd.getOptionValue("u");
+      this.urls = new SynchronizedCycleIterator<String>(cmd.getOptionValues("u"));
       this.threads = Integer.parseInt(cmd.getOptionValue("t", "1"));
       this.loops = Integer.parseInt(cmd.getOptionValue("n", "10"));
       this.rampup = Integer.parseInt(cmd.getOptionValue("r", "0"));
       this.gaptime = Integer.parseInt(cmd.getOptionValue("g", "0"));
-      BenchQuery query = new BenchQuery("arg", cmd.getOptionValue("q", "select current_timestamp"));
-      this.queries = Stream.generate(() -> query).iterator();
+      ArrayList<BenchQuery> queries = new ArrayList<>();
+      int i = 0;
+      for (String q : cmd.getOptionValues("q")) {
+        queries.add(new BenchQuery(String.format("query%d", i), q));
+      }
+      this.queries = new SynchronizedCycleIterator<BenchQuery>(
+          queries.toArray(new BenchQuery[0]));
     }
 
     public static Options get() {
