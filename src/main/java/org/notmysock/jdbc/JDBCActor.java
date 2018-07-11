@@ -50,6 +50,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
       e.printStackTrace();
       return result;
     }
+    logger.start(this);
 
     PreparedStatement stmt = null;
     for (int i = 0; i < loops; i++) {
@@ -91,6 +92,8 @@ public class JDBCActor implements Callable<JDBCRunResult> {
         }
       }
     }
+
+    logger.end(this);
 
     result.setConnection(conn);
     
