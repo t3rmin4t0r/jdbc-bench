@@ -30,6 +30,7 @@ public class JDBCBench {
     
     for(Future<JDBCRunResult> f : results) {
       JDBCRunResult r = f.get();
+	  System.out.println(r);
 
       max = Math.max(max, r.getSamples().max().getAsLong());
       min = Math.min(min, r.getSamples().min().getAsLong());
@@ -39,6 +40,7 @@ public class JDBCBench {
 
       r.close();
     }
+	System.out.flush();
     
     System.out.printf("With %d users (x %d loops) : errors = %d, avg=%d ms, best=%d ms, worst=%d ms\n", opts.threads, opts.loops, errors, (sum/count),  min, max);
   }

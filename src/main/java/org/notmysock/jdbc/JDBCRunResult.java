@@ -51,6 +51,11 @@ public class JDBCRunResult implements AutoCloseable {
   public Connection getConnection() {
     return this.connection;
   }
+
+
+  public String toString() {
+  	return String.format("[Actor #%d] end (loops=%d, avg = %d ms)", getId(), getSamples().count(), getSamples().sum()/getSamples().count());
+  }
   
   @Override
   public void close() {
