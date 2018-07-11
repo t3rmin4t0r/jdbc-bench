@@ -1,14 +1,10 @@
 package org.notmysock.jdbc;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalDouble;
-import java.util.OptionalLong;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.LongStream;
 
 import org.apache.commons.cli.ParseException;
 import org.notmysock.jdbc.BenchUtils.BenchOptions;
@@ -17,9 +13,10 @@ public class JDBCBench {
   public static void main(String[] args) throws ParseException, InterruptedException, ExecutionException {
     BenchOptions opts = BenchUtils.getOptions(args);
     ExecutorService threads = Executors.newFixedThreadPool(opts.threads);
+    JDBCRunLogger logger = new JDBCRunLogger(opts);
     ArrayList<Future<JDBCRunResult>> results = new ArrayList<Future<JDBCRunResult>>(opts.threads);
     for (int i = 0; i < opts.threads; i++) {
-      results.add(threads.submit(new JDBCActor(i, opts.urls.next(), opts.loops, opts.gaptime, opts.queries)));
+      results.add(threads.submit(new JDBCActor(i, opts.urls.next(), opts.loops, opts.gaptime, opts.queries, logger)));
       if (opts.rampup > 0) {
         Thread.sleep(opts.rampup);
       }

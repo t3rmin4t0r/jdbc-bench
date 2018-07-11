@@ -17,29 +17,31 @@ public class JDBCActor implements Callable<JDBCRunResult> {
   private final String url;
   private final int loops;
   private final int gap;
-  private final int num;
+  public final int id;
   private final Iterator<BenchQuery> queries;
+  private final JDBCRunLogger logger;
 
-  public JDBCActor(int num, String url, int loops, int gaptime, Iterator<BenchQuery> queries) {
+  public JDBCActor(int num, String url, int loops, int gaptime, Iterator<BenchQuery> queries, JDBCRunLogger logger) {
     this.url = url;
     this.loops = loops;
     this.gap = gaptime;
-    this.num = num;
+    this.id = num;
     this.queries = queries;
+    this.logger = logger;
   }
 
   public static void main(String[] args) throws Exception {
 
     BenchOptions c = BenchUtils.getOptions(args);
 
-    JDBCActor a = new JDBCActor(1, c.urls.next(), c.loops, c.gaptime, c.queries);
+    JDBCActor a = new JDBCActor(1, c.urls.next(), c.loops, c.gaptime, c.queries, null);
 
     a.call();
   }
 
   @Override
   public JDBCRunResult call() throws Exception {
-    JDBCRunResult result = new JDBCRunResult(num, loops);
+    JDBCRunResult result = new JDBCRunResult(id, loops);
     Connection conn = null;
     try {
       conn = DriverManager.getConnection(this.url);
@@ -59,6 +61,9 @@ public class JDBCActor implements Callable<JDBCRunResult> {
           stmt.execute();
           t1 = System.nanoTime();
           result.success(t0, t1);
+          if (logger != null) {
+            logger.success(this, i, t0, t1);
+          }
         } finally {
           if (stmt != null)
             stmt.close();
@@ -68,13 +73,15 @@ public class JDBCActor implements Callable<JDBCRunResult> {
         e.printStackTrace();
         t1 = System.nanoTime();
         result.fail(t0, t1);
+        if (logger != null) {
+          logger.fail(this, i, t0, t1);
+        }
       }
       long ms = TimeUnit.MILLISECONDS.convert(t1 - t0, TimeUnit.NANOSECONDS);
       long wait = 0;
       if (ms < gap) {
         wait = gap - ms;
       }
-      System.out.printf("[Actor #%03d] Run %d - %d ms (+%d ms)\n", num, i, ms, wait);
       if (wait > 0) {
         try {
           Thread.sleep(wait);
