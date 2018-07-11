@@ -28,11 +28,11 @@ public class JDBCRunLogger {
   }
 
   public void fail(JDBCActor jdbcActor, int i, long t0, long t1) {
-    write(String.format("user-%d, %d, %d, %d, %d, %d, false", jdbcActor.id, i, t0, t1, (t1-t0)));
+    write(String.format("user-%d, %d, %d, %d, %d, false", jdbcActor.id, i, t0, t1, (t1-t0)));
   }
 
   public void success(JDBCActor jdbcActor, int i, long t0, long t1) {
-    write(String.format("user-%d, %d, %d, %d, %d, %d, true", jdbcActor.id, i, t0, t1, (t1-t0)));
+    write(String.format("user-%d, %d, %d, %d, %d, true", jdbcActor.id, i, t0, t1, (t1-t0)));
   }
 
 }
