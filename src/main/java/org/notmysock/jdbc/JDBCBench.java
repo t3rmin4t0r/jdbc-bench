@@ -1,5 +1,6 @@
 package org.notmysock.jdbc;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -10,7 +11,7 @@ import org.apache.commons.cli.ParseException;
 import org.notmysock.jdbc.BenchUtils.BenchOptions;
 
 public class JDBCBench {
-  public static void main(String[] args) throws ParseException, InterruptedException, ExecutionException {
+  public static void main(String[] args) throws ParseException, InterruptedException, ExecutionException, IOException {
     BenchOptions opts = BenchUtils.getOptions(args);
     ExecutorService threads = Executors.newFixedThreadPool(opts.threads);
     JDBCRunLogger logger = new JDBCRunLogger(opts);
