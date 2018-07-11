@@ -2,9 +2,7 @@ package org.notmysock.jdbc;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 
 import org.notmysock.jdbc.BenchUtils.BenchOptions;
 
@@ -18,9 +16,10 @@ public class JDBCRunLogger {
     write("User, Loop, Start, End, Success");
   }
 
-  private void write(String string) {
+  private synchronized void  write(String string) {
     try {
-      out.write(string+"\n");
+      out.write(string);
+      out.write("\n");
       out.flush();
     } catch (IOException e) {
       // TODO Auto-generated catch block
