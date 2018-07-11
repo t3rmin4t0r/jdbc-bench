@@ -28,7 +28,7 @@ public class BenchUtils {
     // split on the 1st "^"
     public static BenchQuery parseLine(String line) {
       int off = line.indexOf('^');
-      String name = line.substring(0, off-1);
+      String name = line.substring(0, off);
       String contents = line.substring(off+1);
       return new BenchQuery(name, contents);
     }
