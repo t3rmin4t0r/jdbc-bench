@@ -12,6 +12,7 @@ public class JDBCRunLogger {
 
   final FileWriter out;
   final AtomicLong count = new AtomicLong(0);
+  final AtomicLong totalTime  = new AtomicLong(0);
   final AtomicLong activeSessions = new AtomicLong(0);
   
   public JDBCRunLogger(BenchOptions opts) throws IOException {
@@ -41,8 +42,9 @@ public class JDBCRunLogger {
   }
 
   public void success(JDBCActor jdbcActor, int i, long t0, long t1) {
-    if(count.incrementAndGet() % 10 == 0) {
-      System.out.printf("ActiveSessions: %9d, Queries Finished: %9d\r", activeSessions.get(), count.get());
+    totalTime.addAndGet(java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(t1-t0));
+    if(count.incrementAndGet() % 10 == 1) {
+      System.out.printf("ActiveSessions: %9d, Queries Finished: %9d, Average time: %9d\r", activeSessions.get(), count.get(), totalTime.get()/count.get());
     }
     write(String.format("user-%d, %d, %d, %d, %d, true", jdbcActor.id, i, t0, t1, (t1-t0)));
   }
