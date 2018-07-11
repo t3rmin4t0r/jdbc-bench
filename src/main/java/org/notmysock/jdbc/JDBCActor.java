@@ -32,7 +32,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
 
     BenchOptions c = BenchUtils.getOptions(args);
 
-    JDBCActor a = new JDBCActor(1, c.url, c.loops, c.gaptime, c.queries);
+    JDBCActor a = new JDBCActor(1, c.urls.next(), c.loops, c.gaptime, c.queries);
 
     a.call();
   }
