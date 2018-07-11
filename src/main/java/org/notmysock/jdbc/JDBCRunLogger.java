@@ -2,6 +2,7 @@ package org.notmysock.jdbc;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.notmysock.jdbc.BenchUtils.BenchOptions;
@@ -11,7 +12,7 @@ public class JDBCRunLogger {
   final FileWriter out;
   
   public JDBCRunLogger(BenchOptions opts) throws IOException {
-    String log = String.format("run_%s_%d_users_x_%d_loops.csv", LocalTime.now().toString(), opts.threads, opts.loops);
+    String log = String.format("run_%s_%s__%d_users_x_%d_loops.csv", LocalDate.now().toString(), LocalTime.now().toString(), opts.threads, opts.loops);
     this.out = new FileWriter(log);
     write("User, Loop, Start, End, Success");
   }
