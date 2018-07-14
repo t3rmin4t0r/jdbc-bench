@@ -16,7 +16,7 @@ public class JDBCBench {
     ExecutorService threads = Executors.newFixedThreadPool(opts.threads);
     if (opts.warmups > 0) {
       for (int i = 0; i < opts.warmups; i++) {
-        JDBCActor actor = new JDBCActor(i, opts.urls.next(), opts.loops, opts.gaptime,
+        JDBCActor actor = new JDBCActor(i, opts.urls.next(), opts.loops, 0,
             opts.queries, null);
         try {
           actor.call();
