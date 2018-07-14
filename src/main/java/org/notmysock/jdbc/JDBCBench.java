@@ -14,6 +14,18 @@ public class JDBCBench {
   public static void main(String[] args) throws ParseException, InterruptedException, ExecutionException, IOException {
     BenchOptions opts = BenchUtils.getOptions(args);
     ExecutorService threads = Executors.newFixedThreadPool(opts.threads);
+    if (opts.warmups > 0) {
+      for (int i = 0; i < opts.warmups; i++) {
+        JDBCActor actor = new JDBCActor(i, opts.urls.next(), opts.loops, opts.gaptime,
+            opts.queries, null);
+        try {
+          actor.call();
+        } catch (Exception e) {
+          e.printStackTrace();
+          // continue in all cases
+        }
+      }
+    }
     JDBCRunLogger logger = new JDBCRunLogger(opts);
     ArrayList<Future<JDBCRunResult>> results = new ArrayList<Future<JDBCRunResult>>(opts.threads);
     for (int i = 0; i < opts.threads; i++) {

@@ -41,6 +41,7 @@ public class BenchUtils {
     public final int rampup;
     public final int gaptime;
     public final Iterator<BenchQuery> queries;
+    public final int warmups;
 
     public BenchOptions(CommandLine cmd) {
       this.urls = new SynchronizedCycleIterator<String>(cmd.getOptionValues("u"));
@@ -48,6 +49,7 @@ public class BenchUtils {
       this.loops = Integer.parseInt(cmd.getOptionValue("n", "10"));
       this.rampup = Integer.parseInt(cmd.getOptionValue("r", "0"));
       this.gaptime = Integer.parseInt(cmd.getOptionValue("g", "0"));
+      this.warmups = Integer.parseInt(cmd.getOptionValue("w", "0"));
       ArrayList<BenchQuery> queries = new ArrayList<>();
       String qf = cmd.getOptionValue("qf");
       if (qf != null) {
@@ -80,6 +82,7 @@ public class BenchUtils {
       options.addOption("g", true, "gap between loops in ms");
       options.addOption("q", true, "query");
       options.addOption("qf", true, "query file");
+      options.addOption("w", true, "warmups");
       return options;
     }
   }
