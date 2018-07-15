@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import org.apache.hive.jdbc.HiveStatement;
 import org.notmysock.jdbc.BenchUtils.BenchOptions;
 import org.notmysock.jdbc.BenchUtils.BenchQuery;
 
@@ -65,7 +66,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
           t1 = System.nanoTime();
           result.success(t0, t1);
           if (logger != null) {
-            logger.success(this, i, t0, t1);
+            logger.success(this, i, stmt, t0, t1);
           }
         } finally {
           if (stmt != null)
@@ -77,7 +78,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
         t1 = System.nanoTime();
         result.fail(t0, t1);
         if (logger != null) {
-          logger.fail(this, i, t0, t1);
+          logger.fail(this, i, stmt, t0, t1);
         }
       }
       long ms = TimeUnit.MILLISECONDS.convert(t1 - t0, TimeUnit.NANOSECONDS);
