@@ -35,6 +35,12 @@
 			<artifactId>hive-jdbc</artifactId>
 			<version>3.0.0</version>
 			<classifier>standalone</classifier>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
