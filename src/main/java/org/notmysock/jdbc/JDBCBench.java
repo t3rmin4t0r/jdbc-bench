@@ -14,10 +14,12 @@ public class JDBCBench {
   public static void main(String[] args) throws ParseException, InterruptedException, ExecutionException, IOException {
     BenchOptions opts = BenchUtils.getOptions(args);
     ExecutorService threads = Executors.newFixedThreadPool(opts.threads);
+    JDBCRunLogger logger = new JDBCRunLogger(opts);
     if (opts.warmups > 0) {
       for (int i = 0; i < opts.warmups; i++) {
         JDBCActor actor = new JDBCActor(i, opts.urls.next(), opts.loops, 0,
-            opts.queries, null);
+            opts.queries, logger);
+        System.out.println("\nWarming up " + actor.url);
         try {
           actor.call();
         } catch (Exception e) {
@@ -26,7 +28,6 @@ public class JDBCBench {
         }
       }
     }
-    JDBCRunLogger logger = new JDBCRunLogger(opts);
     ArrayList<Future<JDBCRunResult>> results = new ArrayList<Future<JDBCRunResult>>(opts.threads);
     for (int i = 0; i < opts.threads; i++) {
       results.add(threads.submit(new JDBCActor(i, opts.urls.next(), opts.loops, opts.gaptime, opts.queries, logger)));
@@ -40,7 +41,7 @@ public class JDBCBench {
     
     for(Future<JDBCRunResult> f : results) {
       JDBCRunResult r = f.get();
-      System.out.println(r);
+      System.out.println("\n"+r);
 
       max = Math.max(max, r.getSamples().max().getAsLong());
       min = Math.min(min, r.getSamples().min().getAsLong());

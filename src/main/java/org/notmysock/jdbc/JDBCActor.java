@@ -3,6 +3,7 @@ package org.notmysock.jdbc;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
@@ -15,7 +16,7 @@ import org.notmysock.jdbc.BenchUtils.BenchQuery;
 
 public class JDBCActor implements Callable<JDBCRunResult> {
 
-  private final String url;
+  public final String url;
   private final int loops;
   private final int gap;
   public final int id;
@@ -63,10 +64,15 @@ public class JDBCActor implements Callable<JDBCRunResult> {
         try {
           stmt = conn.prepareStatement(queries.next().contents);
           stmt.execute();
+          ResultSet rs = stmt.getResultSet();
+          int r = 0;
+          while(rs.next()) {
+            r++;
+          }
           t1 = System.nanoTime();
           result.success(t0, t1);
           if (logger != null) {
-            logger.success(this, i, stmt, t0, t1);
+            logger.success(this, i, stmt, t0, t1, r);
           }
         } finally {
           if (stmt != null)

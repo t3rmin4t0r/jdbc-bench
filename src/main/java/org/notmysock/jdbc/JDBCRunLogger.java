@@ -18,6 +18,8 @@ public class JDBCRunLogger {
   final AtomicLong count = new AtomicLong(0);
   final AtomicLong totalTime  = new AtomicLong(0);
   final AtomicLong activeSessions = new AtomicLong(0);
+
+  final long zero = System.nanoTime();
   
   public JDBCRunLogger(BenchOptions opts) throws IOException {
     String log = String.format("run_%s_%s__%d_users_x_%d_loops.csv", LocalDate.now().toString(), LocalTime.now().toString(), opts.threads, opts.loops);
@@ -55,15 +57,16 @@ public class JDBCRunLogger {
 
   public void fail(JDBCActor jdbcActor, int i, Statement stmt, long t0, long t1) {
     count.incrementAndGet();
-    write(String.format("user-%d, %d, %s, %d, %d, %d, false", jdbcActor.id, i, getQueryId(stmt), t0, t1, (t1-t0)));
+    write(String.format("user-%d, %d, %s, %d, %d, %d, false, -1", jdbcActor.id, i, getQueryId(stmt), t0, t1, (t1-t0)));
   }
 
-  public void success(JDBCActor jdbcActor, int i, Statement stmt, long t0, long t1) {
+  public void success(JDBCActor jdbcActor, int i, Statement stmt, long t0, long t1, int rows) {
     totalTime.addAndGet(java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(t1-t0));
     if(count.incrementAndGet() % 10 == 1) {
-      System.out.printf("ActiveSessions: %9d, Queries Finished: %9d, Average time: %9d\r", activeSessions.get(), count.get(), totalTime.get()/count.get());
+      long t = (System.nanoTime() - zero)/(1000_000_000L);
+      System.out.printf("[%9d s] ActiveSessions: %9d, Queries Finished: %9d, Average time: %9d\r", t, activeSessions.get(), count.get(), totalTime.get()/count.get());
     }
-    write(String.format("user-%d, %d, %s, %d, %d, %d, true", jdbcActor.id, i, getQueryId(stmt), t0, t1, (t1-t0)));
+    write(String.format("user-%d, %d, %s, %d, %d, %d, true, %d", jdbcActor.id, i, getQueryId(stmt), t0, t1, (t1-t0), rows));
   }
   
   public void end(JDBCActor jdbcActor) {
