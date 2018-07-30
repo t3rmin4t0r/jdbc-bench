@@ -55,18 +55,18 @@ public class JDBCRunLogger {
     return queryId;
   }
 
-  public void fail(JDBCActor jdbcActor, int i, Statement stmt, long t0, long t1) {
+  public void fail(JDBCActor jdbcActor, int i, String queryName, Statement stmt, long t0, long t1) {
     count.incrementAndGet();
-    write(String.format("user-%d, %d, %s, %d, %d, %d, false, -1", jdbcActor.id, i, getQueryId(stmt), t0, t1, (t1-t0)));
+    write(String.format("user-%d, %d, %s, %s, %d, %d, %d, false, -1", jdbcActor.id, i, queryName, getQueryId(stmt), t0, t1, (t1-t0)));
   }
 
-  public void success(JDBCActor jdbcActor, int i, Statement stmt, long t0, long t1, int rows) {
+  public void success(JDBCActor jdbcActor, int i, String queryName, Statement stmt, long t0, long t1, int rows) {
     totalTime.addAndGet(java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(t1-t0));
     if(count.incrementAndGet() % 10 == 1) {
       long t = (System.nanoTime() - zero)/(1000_000_000L);
       System.out.printf("[%9d s] ActiveSessions: %9d, Queries Finished: %9d, Average time: %9d\r", t, activeSessions.get(), count.get(), totalTime.get()/count.get());
     }
-    write(String.format("user-%d, %d, %s, %d, %d, %d, true, %d", jdbcActor.id, i, getQueryId(stmt), t0, t1, (t1-t0), rows));
+    write(String.format("user-%d, %d, %s, %s, %d, %d, %d, true, %d", jdbcActor.id, i, queryName, getQueryId(stmt), t0, t1, (t1-t0), rows));
   }
   
   public void end(JDBCActor jdbcActor) {

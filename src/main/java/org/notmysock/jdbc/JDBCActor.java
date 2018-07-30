@@ -60,9 +60,12 @@ public class JDBCActor implements Callable<JDBCRunResult> {
     for (int i = 0; i < loops; i++) {
       long t0 = System.nanoTime();
       long t1 = -1;
+      String queryName = "unknown";
       try {
         try {
-          stmt = conn.prepareStatement(queries.next().contents);
+          BenchQuery query = queries.next();
+          queryName = query.name;
+          stmt = conn.prepareStatement(query.contents);
           stmt.execute();
           ResultSet rs = stmt.getResultSet();
           int r = 0;
@@ -72,7 +75,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
           t1 = System.nanoTime();
           result.success(t0, t1);
           if (logger != null) {
-            logger.success(this, i, stmt, t0, t1, r);
+            logger.success(this, i, queryName, stmt, t0, t1, r);
           }
         } finally {
           if (stmt != null)
@@ -84,7 +87,7 @@ public class JDBCActor implements Callable<JDBCRunResult> {
         t1 = System.nanoTime();
         result.fail(t0, t1);
         if (logger != null) {
-          logger.fail(this, i, stmt, t0, t1);
+          logger.fail(this, i, queryName, stmt, t0, t1);
         }
       }
       long ms = TimeUnit.MILLISECONDS.convert(t1 - t0, TimeUnit.NANOSECONDS);
