@@ -2,11 +2,14 @@ package org.notmysock.jdbc;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.hive.jdbc.HiveStatement;
@@ -41,31 +44,53 @@ public class JDBCRunLogger {
   public void start(JDBCActor jdbcActor) {
     activeSessions.incrementAndGet();
   }
-  
+
   private String getQueryId(Statement stmt) {
     String queryId = "unknown";
+
     if (stmt instanceof HiveStatement) {
       try {
-        queryId = ((HiveStatement)stmt).getQueryId();
-      } catch (SQLException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        Method method = stmt.getClass().getMethod("getQueryId", new Class[] {});
+        method.invoke(stmt, new Object[] {});
+      } catch (Exception ex) {
+        // there's no actual remedy
+        ex.printStackTrace();
       }
     }
     return queryId;
   }
 
+  /**
+   * 
+   * @param jdbcActor
+   * @param i
+   * @param queryName
+   * @param stmt
+   * @param t0 (ms)
+   * @param t1 (ms)
+   */
   public void fail(JDBCActor jdbcActor, int i, String queryName, Statement stmt, long t0, long t1) {
     count.incrementAndGet();
     write(String.format("user-%d, %d, %s, %s, %d, %d, %d, false, -1", jdbcActor.id, i, queryName, getQueryId(stmt), t0, t1, (t1-t0)));
   }
 
+  /**
+   * 
+   * @param jdbcActor
+   * @param i
+   * @param queryName
+   * @param stmt
+   * @param t0 (ms)
+   * @param t1 (ms)
+   * @param rows (row-counts)
+   */
   public void success(JDBCActor jdbcActor, int i, String queryName, Statement stmt, long t0, long t1, int rows) {
-    totalTime.addAndGet(java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(t1-t0));
-    if(count.incrementAndGet() % 10 == 1) {
-      long t = (System.nanoTime() - zero)/(1000_000_000L);
-      System.out.printf("[%9d s] ActiveSessions: %9d, Queries Finished: %9d, Average time: %9d\r", t, activeSessions.get(), count.get(), totalTime.get()/count.get());
-    }
+    totalTime.addAndGet(t1-t0);
+    count.incrementAndGet();
+
+    long t = TimeUnit.SECONDS.convert(System.nanoTime() - zero, TimeUnit.NANOSECONDS);
+    System.out.printf("[%9d s] ActiveSessions: %9d, Queries Finished: %9d, Average time: %9d\r", 
+                            t, activeSessions.get(), count.get(), totalTime.get()/count.get());
     write(String.format("user-%d, %d, %s, %s, %d, %d, %d, true, %d", jdbcActor.id, i, queryName, getQueryId(stmt), t0, t1, (t1-t0), rows));
   }
   

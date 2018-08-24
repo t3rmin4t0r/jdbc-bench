@@ -17,7 +17,7 @@ public class JDBCBench {
     JDBCRunLogger logger = new JDBCRunLogger(opts);
     if (opts.warmups > 0) {
       for (int i = 0; i < opts.warmups; i++) {
-        JDBCActor actor = new JDBCActor(i, opts.urls.next(), opts.loops, 0,
+        JDBCActor actor = new JDBCActor(i, opts.urls.next(), 1, 0,
             opts.queries, logger);
         System.out.println("\nWarming up " + actor.url);
         try {
@@ -53,6 +53,7 @@ public class JDBCBench {
     }
     System.out.flush();
     
-    System.out.printf("With %d users (x %d loops) : errors = %d, avg=%d ms, best=%d ms, worst=%d ms\n", opts.threads, opts.loops, errors, (sum/count),  min, max);
+    System.out.printf("With %d users (x %d loops) : errors = %d, avg=%d ms, best=%d ms, worst=%d ms\n", 
+        opts.threads, opts.loops, errors, (sum/count),  min, max);
   }
 }

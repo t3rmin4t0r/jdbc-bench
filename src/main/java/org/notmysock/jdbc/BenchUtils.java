@@ -42,14 +42,17 @@ public class BenchUtils {
     public final int gaptime;
     public final Iterator<BenchQuery> queries;
     public final int warmups;
+    public final boolean verbose;
 
     public BenchOptions(CommandLine cmd) {
       this.urls = new SynchronizedCycleIterator<String>(cmd.getOptionValues("u"));
       this.threads = Integer.parseInt(cmd.getOptionValue("t", "1"));
-      this.loops = Integer.parseInt(cmd.getOptionValue("n", "10"));
+      this.loops = Integer.parseInt(cmd.getOptionValue("n", "1"));
       this.rampup = Integer.parseInt(cmd.getOptionValue("r", "0"));
       this.gaptime = Integer.parseInt(cmd.getOptionValue("g", "0"));
       this.warmups = Integer.parseInt(cmd.getOptionValue("w", "0"));
+      this.verbose = cmd.hasOption("v");
+
       ArrayList<BenchQuery> queries = new ArrayList<>();
       String qf = cmd.getOptionValue("qf");
       if (qf != null) {
@@ -69,7 +72,7 @@ public class BenchUtils {
           queries.add(new BenchQuery(String.format("query%d", i), q));
         }
       }
-      this.queries = new SynchronizedCycleIterator<BenchQuery>(
+      this.queries = new SynchronizedOnceIterator<BenchQuery>(
           queries.toArray(new BenchQuery[0]));
     }
 
@@ -83,6 +86,7 @@ public class BenchUtils {
       options.addOption("q", true, "query");
       options.addOption("qf", true, "query file");
       options.addOption("w", true, "warmups");
+      options.addOption("v", false, "verbose");
       return options;
     }
   }
