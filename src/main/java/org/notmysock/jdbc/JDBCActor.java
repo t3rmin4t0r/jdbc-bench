@@ -75,12 +75,12 @@ public class JDBCActor implements Callable<JDBCRunResult> {
 
   private boolean runBenchmark(Connection conn, JDBCRunResult result)
       throws SQLException {
-    long t0 = System.nanoTime();
-    long t1 = -1;
-    long realTime = System.currentTimeMillis();
     String queryName = "unknown";
     int i = 0;
     while (queries.hasNext()) {
+      long t0 = System.nanoTime();
+      long t1 = -1;
+      long realTime = System.currentTimeMillis();
       PreparedStatement stmt = null;
       BenchQuery query = queries.next();
       if (query == null) {
@@ -121,17 +121,17 @@ public class JDBCActor implements Callable<JDBCRunResult> {
         }
       }
       i++;
-    }
-    long ms = TimeUnit.MILLISECONDS.convert(t1 - t0, TimeUnit.NANOSECONDS);
-    long wait = 0;
-    if (ms < gap) {
-      wait = gap - ms;
-    }
-    if (wait > 0) {
-      try {
-        Thread.sleep(wait);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      long ms = TimeUnit.MILLISECONDS.convert(t1 - t0, TimeUnit.NANOSECONDS);
+      long wait = 0;
+      if (ms < gap) {
+        wait = gap - ms;
+      }
+      if (wait > 0) {
+        try {
+          Thread.sleep(wait);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
       }
     }
     return true;
